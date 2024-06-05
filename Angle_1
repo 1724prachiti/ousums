@@ -1,0 +1,109 @@
+import numpy as np
+import cv2
+import  pandas as pd
+img = cv2.imread("C:\\Users\\DELL\\OneDrive\\Pictures\\6_copy.jpg")
+img = cv2.resize(img , (640 , 800))
+
+gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+img_c= img.copy()
+img = cv2.GaussianBlur(img , (3 , 3) , 3)
+
+ret, binary_image = cv2.threshold(gray_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+# Print the threshold value found by Otsu's method
+print(f"Otsu's threshold value: {ret}")
+print(type(ret))
+
+
+ret , thresh = cv2.threshold(gray_image , ret , 255 , cv2.THRESH_BINARY)
+
+contours , _ = cv2.findContours(thresh , cv2.RETR_TREE , cv2.CHAIN_APPROX_NONE)
+area = {}
+for i in range(len(contours)):
+    cnt = contours[i]
+    ar = cv2.contourArea(cnt)
+    area[i] = ar
+srt = sorted(area.items() , key = lambda x : x[1] , reverse = True)
+results = np.array(srt).astype("int")
+num = np.argwhere(results[: , 1] > 30).shape[0]
+
+for i in range(0 , num):
+    image_copy = cv2.drawContours(img_c , contours , results[i , 0],
+                                  (0 , 255 , 0) , 3)
+
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+cv2.imshow('image', image_copy)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+gray_image = cv2.cvtColor(image_copy, cv2.COLOR_BGR2GRAY)
+cv2.imshow('gi', gray_image)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+t_lower = 100  # Lower Threshold
+t_upper = 105  # Upper threshold
+
+# Applying the Canny Edge filter
+edge = cv2.Canny(image_copy, t_lower, t_upper)
+
+cv2.imshow('original', img)
+cv2.imshow('edge', edge)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+white_pixel_coords = np.column_stack(np.where(edge == 255))
+
+print(white_pixel_coords)
+df = pd.DataFrame(white_pixel_coords, columns=['x', 'y'])
+
+print(df)
+# Find the index of the maximum 'Row' value (assuming 'Row' is the y-coordinate)
+max_x_index = df['x'].idxmax()
+
+# Retrieve the corresponding row
+max_x_coord = df.loc[max_x_index]
+
+print("Coordinate with maximum x value:")
+print(max_x_coord)
+max_y_index = df['y'].idxmax()
+
+# Retrieve the corresponding row
+max_y_coord = df.loc[max_y_index]
+
+print("Coordinate with maximum y value:")
+print(max_y_coord)
+
+min_x_index = df['x'].idxmin()
+
+# Retrieve the corresponding row
+min_x_coord = df.loc[min_x_index]
+
+print("Coordinate with minimum x value:")
+print(min_x_coord)
+
+min_y_index = df['y'].idxmin()
+
+# Retrieve the corresponding row
+min_y_coord = df.loc[min_y_index]
+
+print("Coordinate with minimum y value:")
+print(min_y_coord)
+
+
+import matplotlib.pyplot as plt
+xy1, xy2 = [799,495  ],[288,1]
+plt.plot(xy1, xy2,  marker = 'o')
+plt.show() 
+
+deltaY = xy1[1] - xy2[1]
+deltaX = xy1[0] - xy2[0]
+angleInDegrees = [np.arctan(deltaY / deltaX)]
+print(angleInDegrees)
+
+
+
+
+
+
