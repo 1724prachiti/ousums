@@ -1,0 +1,152 @@
+#1
+import cv2
+import numpy as np
+
+# Load the imageC:\\Users\\DELL\\OneDrive\\Desktop\\Trikon\\10.jpg
+image = cv2.imread("C:\\Users\\DELL\\OneDrive\\Pictures\\6_copy.jpg", cv2.IMREAD_GRAYSCALE)
+
+image = cv2.resize(image , (640 , 800))
+cv2.imshow('img',image)
+# Check if the image was loaded properly
+if image is None:
+    print("Error loading image")
+    exit()
+
+# Apply Otsu's thresholding to convert the grayscale image to a binary image
+ret, binary_image = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+# Print the threshold value found by Otsu's method
+print(f"Otsu's threshold value: {ret}")
+print(type(ret))
+
+
+
+
+ret , thresh = cv2.threshold(binary_image , ret , 255 , cv2.THRESH_BINARY) #Turning all the parts that have less than ret value into black
+
+contours , _ = cv2.findContours(thresh , cv2.RETR_CCOMP , cv2.CHAIN_APPROX_SIMPLE)
+
+# Find contours in the binary image
+contours, hierarchy = cv2.findContours(binary_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+# Draw the contours on the original image (for visualization purposes)
+image_copy = cv2.drawContours(binary_image , contours ,-1 ,(0 , 255 , 0) , 3) #Convert to BGR to draw colored contours
+cv2.imshow('ic', image_copy)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+
+#***********************
+import numpy as np #numpy
+import cv2  #cv2
+import  pandas as pd
+
+
+area = {}
+for i in range(len(contours)):
+    cnt = contours[i]
+    ar = cv2.contourArea(cnt)
+    area[i] = ar
+values_list = list(area.values())
+print(values_list)
+
+
+
+
+import numpy as np
+values_list= np.array(values_list)
+
+print(np.sort(values_list))
+import numpy as np
+
+
+values_list = list(set(values_list))
+print(values_list)
+
+# Calculate Q1 (25th percentile) and Q3 (75th percentile)
+Q1 = np.percentile(values_list, 25)
+Q3 = np.percentile(values_list, 75)
+
+# Calculate the IQR
+IQR = Q3 - Q1
+
+# Define the bounds for outliers
+
+# Initialize two lists to hold the separated values
+large_values = []
+other_values = []
+print(Q1)
+print(Q3)
+# Iterate through each value in the list
+for value in values_list:
+    if value < Q1 or value > Q3:
+        large_values.append(value)
+    else:
+        other_values.append(value)
+
+# Print the results
+print("Oddly large values:", large_values)
+print("Other values:", other_values)
+
+print('no. of triangles are triangles:'+str(len(other_values)))
+
+
+'''
+# Calculate Q1 (25th percentile) and Q3 (75th percentile)
+q1 = np.percentile(large_values, 25)
+q3 = np.percentile(large_values, 75)
+
+# Calculate the IQR
+IQR1 = q3 - q1
+
+# Define the bounds for outliers
+lower_bound1 = q1 - 1.5 * IQR1
+upper_bound1 = Q3 + 1.5 * IQR1
+
+# Initialize two lists to hold the separated values
+large_values1 = []
+other_values1 = []
+
+# Iterate through each value in the list
+for value in large_values:
+    if value < lower_bound1 or value > upper_bound1:
+        large_values1.append(value)
+    else:
+        other_values1.append(value)
+
+# Print the results
+print("Oddly large values:", large_values1)
+print("Other values:", other_values1)
+
+#4
+# Calculate Q1 (25th percentile) and Q3 (75th percentile)
+p1 = np.percentile(large_values1, 25)
+p3 = np.percentile(large_values1, 75)
+
+# Calculate the IQR
+IQR1 = p3 - p1
+
+# Define the bounds for outliers
+lower_bound2 = p1 - 1.5 * IQR1
+upper_bound2 = p3 + 1.5 * IQR1
+
+# Initialize two lists to hold the separated values
+large_values2 = []
+other_values2 = []
+
+# Iterate through each value in the list
+for value in large_values1:
+    if value < lower_bound2 or value > upper_bound2:
+        large_values2.append(value)
+    else:
+        other_values2.append(value)
+
+# Print the results
+print("Oddly large values:", large_values2)
+print("Other values:", other_values2)
+
+
+'''
+
+print('no of triangles are'+ str(len(other_values)))
