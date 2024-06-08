@@ -1,0 +1,9 @@
+Here is how the JSK2 code works
+1] I load all the models to work on SAM.
+2] I load the image
+3] Generated masks and then one by one viewed all the masks on a grid so we can know what are we working with.
+4]Then I create  a list called 'maskk' which has all the segmentation array
+5] Then I take one by one all these maskk elements and get the coordinates of these.
+6] To get the vertices of the edge of the triangle that I want to work with, I calculate the min y and maxy out of the coordinate and then calculate the angle of this edge of all the triangles.
+7] Final array containing the angles is shown.
+LIMITATION: Segment anything meta masks all the objects, which gives us unprecise predictions of triangles, and therefore, we get angles of things that are not necessary.
